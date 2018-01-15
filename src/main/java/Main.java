@@ -8,14 +8,8 @@ public class Main {
     	
         get("/sparql/:query", (req, res) ->{
         	String query = req.params(":query");
-		    String queryString = "PREFIX foaf:  <http://a.com/ontology/> SELECT DISTINCT ?property"+
-
-		    		" WHERE { "+
-
-		    	 " ?s ?property ?o ."+
-
-		    	"}";
-        	return talk.ExecuteQuery(queryString);
+		    System.out.println(query);
+        	return talk.ExecuteQuery(query);
         });
     }
 }
