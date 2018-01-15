@@ -9,7 +9,7 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.http.HTTPRepository;
 
 public class Talk {
-	String rdf4jServer = "http://77.55.220.23:8080/rdf4j-server/";
+	String rdf4jServer = "http://localhost:8080/rdf4j-server/";
 	String repositoryID = "family-memory-rdfs";
 	Repository repo;
 	
