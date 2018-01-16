@@ -33,7 +33,7 @@ public class Talk {
 					for(String s : l) {
 						resultToReturn+=(s+" = ");
 						resultToReturn+=bindingSet.getValue((s));
-						resultToReturn+="||";
+						resultToReturn+="\n";
 					}
 			      }	
 			}
