@@ -13,6 +13,8 @@ public class Talk {
 	String repositoryID = "family-memory-rdfs";
 	String getOntologyClassesQuery = "PREFIX bc: <http://a.com/ontology#> SELECT DISTINCT ?type WHERE { ?type a owl:Class FILTER ( STRSTARTS(STR(?type),str(bc:)))}";
 	String getAllClassesQuery = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT DISTINCT ?type WHERE {?s a ?type.}";
+	String getOwlObjectProperties = GetPrefixes() + "SELECT DISTINCT ?p WHERE {?p rdf:type owl:ObjectProperty.}";
+	String getOwlDatatypeProperties = GetPrefixes() + "SELECT DISTINCT ?p WHERE {?p rdf:type owl:DatatypeProperty.}";
 	Repository repo;
 	
 	public void LoadRepository() {			
@@ -45,6 +47,27 @@ public class Talk {
 	
 	public String GetAllClasses() {
 		return ExecuteQuery(getAllClassesQuery);
+	}
+
+	public String GetObjectProperties() {
+		return ExecuteQuery(getOwlObjectProperties);
+	}
+
+	public String GetDatatypeProperties() {
+		return ExecuteQuery(getOwlDatatypeProperties);
+	}
+
+	public String GetPrefixes()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ");
+		sb.append("PREFIX owl: <http://www.w3.org/2002/07/owl#> ");
+		sb.append("PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> ");
+		sb.append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> ");
+		sb.append("PREFIX bc: <http://a.com/ontology#> ");
+		sb.append("PREFIX swrl: <http://www.w3.org/2003/11/swrl#> ");
+
+		return sb.toString();
 	}
 	
 }
