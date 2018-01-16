@@ -9,8 +9,10 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.http.HTTPRepository;
 
 public class Talk {
-	String rdf4jServer = "http://localhost:8080/rdf4j-server/";
+	String rdf4jServer = "http://77.55.220.23:8080//rdf4j-server/";
 	String repositoryID = "family-memory-rdfs";
+	String getOntologyClassesQuery = "PREFIX bc: <http://a.com/ontology#> SELECT DISTINCT ?type WHERE {?subject a ?type.FILTER( STRSTARTS(STR(?type),str(bc:)) )}";
+	String getAllClassesQuery = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT DISTINCT ?type WHERE {?s a ?type.}";
 	Repository repo;
 	
 	public void LoadRepository() {			
@@ -27,14 +29,22 @@ public class Talk {
 					BindingSet bindingSet = result.next();
 					Set<String>l = bindingSet.getBindingNames();
 					for(String s : l) {
-						resultToReturn+="s = ";
+						resultToReturn+=(s+" = ");
 						resultToReturn+=bindingSet.getValue((s));
-						resultToReturn+=System.lineSeparator();
+						resultToReturn+="||";
 					}
 			      }	
 			}
 		}
-		return resultToReturn;
-	
+		return resultToReturn;	
 	}
+	
+	public String GetClasses() {
+		return ExecuteQuery(getOntologyClassesQuery);
+	}
+	
+	public String GetAllClasses() {
+		return ExecuteQuery(getAllClassesQuery);
+	}
+	
 }

@@ -11,5 +11,13 @@ public class Main {
 		    System.out.println(query);
         	return talk.ExecuteQuery(query);
         });
+        
+        get("/classes", (req, res) -> {
+        	return talk.GetClasses();
+        });
+        
+        get("/classes-all", (req, res) -> {
+        	return talk.GetAllClasses();
+        });
     }
 }
