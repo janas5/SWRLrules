@@ -6,7 +6,8 @@ class Rule extends Component {
     render() {
       return (
         <div className="query-result">
-          {this.props.details.id.value}
+          {/* {this.props.details.id.value} */}
+          {this.props.details}
         </div>
       );
     }

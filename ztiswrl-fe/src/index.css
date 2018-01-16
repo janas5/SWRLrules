@@ -12,6 +12,10 @@ header {
   border: solid 1px silver;
   border-radius: 5px;
   padding: 25px;
+  position: sticky;
+  padding-top: 25px;
+  top: 25px;
+  margin-top: 25px;
 }
 
 .query-results {
@@ -24,6 +28,10 @@ header {
   border-bottom: solid 1px silver;
   margin-top: 0;
   padding-bottom: 5px;
+  position: sticky;
+  padding-top: 25px;
+  top: -1px;
+  background-color: white;
 }
 
 .query-results-warning {
@@ -32,4 +40,18 @@ header {
   color: silver;
   padding: 25px;
   text-align: center;
+}
+
+.query-results-quantity {
+  float: right;
+}
+
+.query-result {
+  width: 100%;
+  color: white;
+  background-color: #205587;
+  padding: 25px;
+  list-style-type: lower-greek;
+  margin-top: 15px;
+  border-radius: 5px;
 }
