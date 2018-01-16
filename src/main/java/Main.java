@@ -20,11 +20,11 @@ public class Main {
             return talk.GetAllClasses();
         });
 
-        get("/objprop", (req, res) -> {
+        get("/obj-prop", (req, res) -> {
             return talk.GetObjectProperties();
         });
 
-        get("/datatypeprop", (req, res) -> {
+        get("/datatype-prop", (req, res) -> {
             return talk.GetDatatypeProperties();
         });
     }
