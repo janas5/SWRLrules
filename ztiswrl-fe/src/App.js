@@ -8,9 +8,11 @@ import './App.css';
 
 const tooltip = (
 	<Tooltip id="tooltip">
-		<strong>Jeszcze nie zaimplementowano!</strong> Prosimy czekać.
+		<strong>Pytanie musi zostać wprowadzone w poprawnym formacie!</strong>
 	</Tooltip>
 );
+
+const queryBase = `http://77.55.220.23:4567/sparql/PREFIX%20bc%3A%20%3Chttp%3A%2F%2Fa.com%2Fontology%23%3E%20`;
 
 class App extends Component {
 
@@ -18,7 +20,7 @@ class App extends Component {
 
   componentDidMount() {
     let self = this;
-    axios({method: 'GET', url: `http://77.55.220.23:4567/sparql/PREFIX%20bc%3A%20%3Chttp%3A%2F%2Fa.com%2Fontology%23%3E%20SELECT%20DISTINCT%20%3Ftype%20WHERE%20%7B%3Fsubject%20%3Fa%20%3Ftype.FILTER(%20STRSTARTS(STR(%3Ftype)%2Cstr(bc%3A))%20)%7D`,
+    axios({method: 'GET', url: queryBase+`SELECT%20DISTINCT%20%3Ftype%20WHERE%20%7B%3Fsubject%20%3Fa%20%3Ftype.FILTER(%20STRSTARTS(STR(%3Ftype)%2Cstr(bc%3A))%20)%7D`,
   json: true})
     .then(response => {
       self.setState({rules: response.data, resultsQuantity: response.data.split(/\r\n|\r|\n/).length-1});
@@ -30,18 +32,18 @@ class App extends Component {
     self.setState({isSomeQuery: true});
   }
 
-  executeQuery() {
-  //   let self = this;
-  //   axios({method: 'GET', url: `http://77.55.220.23:4567/sparql/PREFIX%20bc%3A%20%3Chttp%3A%2F%2Fa.com%2Fontology%23%3E%20SELECT%20DISTINCT%20%3Ftype%20WHERE%20%7B%3Fsubject%20%3Fa%20%3Ftype.FILTER(%20STRSTARTS(STR(%3Ftype)%2Cstr(bc%3A))%20)%7D`,
-  // json: true})
-  //   .then(response => {
-  //     self.setState({rules: response.data});
-  //     //self.setState({companies: response.data, pageCount: 2});
-  //     console.log(response.data);
-  //   })
-  //   .catch(error => {
-  //     console.log(error);
-  //   });
+  executeQuery = (e) => {
+    e.preventDefault();
+    let self = this;
+    axios({method: 'GET', url: queryBase+`Select%20Distinct%20*%0AWhere%20%7B%20%3Fp%20rdf%3Atype%20owl%3ADatatypeProperty%20%7D`,
+  json: true})
+    .then(response => {
+      self.setState({rules: response.data, resultsQuantity: response.data.split(/\r\n|\r|\n/).length-1});
+      console.log(response.data);
+    })
+    .catch(error => {
+      console.log(error);
+    });
   }
 
   renderRules(data) {
@@ -70,7 +72,7 @@ class App extends Component {
         </header>
         <div className="container">
           <Col xs={6} className="query-form">
-            <form onSubmit={this.executeQuery()}>
+            <form onSubmit={this.executeQuery}>
               <FormGroup bsSize="large">
                 <FormControl type="text" placeholder="Wpisz pytanie SPARQL..." />
               </FormGroup>
