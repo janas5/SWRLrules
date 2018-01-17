@@ -16,7 +16,7 @@ const queryBase = `http://77.55.220.23:4567/sparql/PREFIX%20bc%3A%20%3Chttp%3A%2
 
 class App extends Component {
 
-  state = {query: '', rules: [], isSomeQuery: false, resultsQuantity: 0};
+  state = {query: '', rules: [], isSomeQuery: false, currentQuery: '', resultsQuantity: 0};
 
   componentDidMount() {
     let self = this;
@@ -35,7 +35,7 @@ class App extends Component {
   executeQuery = (e) => {
     e.preventDefault();
     let self = this;
-    axios({method: 'GET', url: queryBase+`Select%20Distinct%20*%0AWhere%20%7B%20%3Fp%20rdf%3Atype%20owl%3ADatatypeProperty%20%7D`,
+    axios({method: 'GET', url: queryBase + this.state.currentQuery,
   json: true})
     .then(response => {
       self.setState({rules: response.data, resultsQuantity: response.data.split(/\r\n|\r|\n/).length-1});
@@ -44,6 +44,11 @@ class App extends Component {
     .catch(error => {
       console.log(error);
     });
+  }
+
+  handleChange = (e) => {
+    e.preventDefault();
+    this.setState({currentQuery: e.target.value});
   }
 
   renderRules(data) {
@@ -74,7 +79,7 @@ class App extends Component {
           <Col xs={6} className="query-form">
             <form onSubmit={this.executeQuery}>
               <FormGroup bsSize="large">
-                <FormControl type="text" placeholder="Wpisz pytanie SPARQL..." />
+                <FormControl type="text" value={this.state.currentQuery} onChange={this.handleChange} placeholder="Wpisz pytanie SPARQL..." />
               </FormGroup>
               <OverlayTrigger placement="left" overlay={tooltip}>
                 <Button type="submit" bsStyle="primary">Wyślij zapytanie</Button>
@@ -96,3 +101,5 @@ export default App;
 // <p className="App-intro">
 //               To get started, edit <code>src/App.js</code> and save to reload.
 //             </p>
+
+//Select%20Distinct%20*%0AWhere%20%7B%20%3Fp%20rdf%3Atype%20owl%3ADatatypeProperty%20%7D
