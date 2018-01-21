@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 
 import org.eclipse.rdf4j.query.BindingSet;
@@ -10,11 +13,18 @@ import org.eclipse.rdf4j.repository.http.HTTPRepository;
 
 public class Talk {
 	String rdf4jServer = "http://77.55.220.23:8080//rdf4j-server/";
-	String repositoryID = "family-memory-rdfs";
+	String repositoryID = "family-memory-rdf";
 	String getOntologyClassesQuery = "PREFIX bc: <http://a.com/ontology#> SELECT DISTINCT ?type WHERE { ?type a owl:Class FILTER ( STRSTARTS(STR(?type),str(bc:)))}";
 	String getAllClassesQuery = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT DISTINCT ?type WHERE {?s a ?type.}";
 	String getOwlObjectProperties = GetPrefixes() + "SELECT DISTINCT ?p WHERE {?p rdf:type owl:ObjectProperty.}";
 	String getOwlDatatypeProperties = GetPrefixes() + "SELECT DISTINCT ?p WHERE {?p rdf:type owl:DatatypeProperty.}";
+	String getRules = GetPrefixes()+ "SELECT DISTINCT *\r\n" + 
+			"{\r\n" + 
+			"?atomListExt ?Header ?atomListInt.\r\n" + 
+			"?atomListExt swrl:head|swrl:body ?atomListInt.\r\n" + 
+			"?atomListInt rdf:first ?swrlSub.\r\n" + 
+			"?swrlSub ?swrlPred ?swrlObj.\r\n" + 
+			"}";
 	Repository repo;
 	
 	public void LoadRepository() {			
@@ -57,6 +67,24 @@ public class Talk {
 		return ExecuteQuery(getOwlDatatypeProperties);
 	}
 
+	public String GetRules() {
+		Scanner scanner = new Scanner(ExecuteQuery(getRules));
+		String result = "";
+		List<String>list = new ArrayList<String>();
+		while (scanner.hasNextLine()) {
+			String s = scanner.nextLine();
+			if(s.contains("http://a.com/ontology#Def")) {
+				if(!list.contains(s)) {
+					String[] temp = s.split("#Def-");
+					result+=temp[1]+"\n";
+					list.add(s);
+				}
+			}
+		}
+		scanner.close();		
+		return result;
+	}
+	
 	public String GetPrefixes()
 	{
 		StringBuilder sb = new StringBuilder();

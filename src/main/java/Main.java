@@ -27,5 +27,10 @@ public class Main {
         get("/datatype-prop", (req, res) -> {
             return talk.GetDatatypeProperties();
         });
+        
+
+        get("/rules", (req, res) -> {
+            return talk.GetRules();
+        });
     }
 }
