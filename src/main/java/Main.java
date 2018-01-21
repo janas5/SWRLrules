@@ -32,5 +32,9 @@ public class Main {
         get("/rules", (req, res) -> {
             return talk.GetRules();
         });
+        
+        get("/rules-all", (req, res) -> {
+            return talk.GetRulesDefinitions();
+        });
     }
 }
