@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -19,11 +20,11 @@ public class Talk {
 	String getOwlObjectProperties = GetPrefixes() + "SELECT DISTINCT ?p WHERE {?p rdf:type owl:ObjectProperty.}";
 	String getOwlDatatypeProperties = GetPrefixes() + "SELECT DISTINCT ?p WHERE {?p rdf:type owl:DatatypeProperty.}";
 	String getRules = GetPrefixes()+ "SELECT DISTINCT *\r\n" + 
-	"{\r\n" + 
-	"?atomListExt ?Header ?atomListInt.\r\n" + 
-	"?atomListExt swrl:head ?atomListInt.\r\n" + 
-	"?atomListInt rdf:first ?swrlSub.\r\n" + 
-	"?swrlSub ?swrlPred ?swrlObj.\r\n}";
+			"{\r\n" + 
+			"?atomListExt ?Header ?atomListInt.\r\n" + 
+			"?atomListExt swrl:head ?atomListInt.\r\n" + 
+			"?atomListInt rdf:first ?swrlSub.\r\n" + 
+			"?swrlSub ?swrlPred ?swrlObj.\r\n}";
 	
 	String getRules2 = GetPrefixes()+ "SELECT DISTINCT *\r\n" + 
 			"{\r\n" + 
@@ -39,9 +40,6 @@ public class Talk {
 			"?atomListInt rdf:rest ?swrlSub.\r\n" + 
 			"?swrlSub rdf:first ?swrlObj.\r\n" + 
 			"?swrlObj ?a ?b.\r\n}";
-
-
-	
 	
 	Repository repo;
 	
@@ -50,7 +48,7 @@ public class Talk {
 		repo.initialize();
 	}
 	
-	public String ExecuteQuery(String query) {
+	public String ExecuteQuery(String query, String filter) {
 		String resultToReturn = "";
 		try (RepositoryConnection conn = repo.getConnection()){
 			TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
@@ -59,8 +57,10 @@ public class Talk {
 					BindingSet bindingSet = result.next();
 					Set<String>l = bindingSet.getBindingNames();
 					for(String s : l) {
-						if(s.equals("atomListExt") && !bindingSet.getValue((s)).toString().equals("http://a.com/ontology#Def-hasBrother"))
-							break;
+						if(!filter.equals("")) {
+							if(s.equals("atomListExt") && !bindingSet.getValue((s)).toString().contains(filter.toString()))
+								break;
+						}
 						resultToReturn+=(s+" = ");
 						resultToReturn+=bindingSet.getValue((s));
 						resultToReturn+="\n";
@@ -72,23 +72,23 @@ public class Talk {
 	}
 	
 	public String GetClasses() {
-		return ExecuteQuery(getOntologyClassesQuery);
+		return ExecuteQuery(getOntologyClassesQuery,"");
 	}
 	
 	public String GetAllClasses() {
-		return ExecuteQuery(getAllClassesQuery);
+		return ExecuteQuery(getAllClassesQuery,"");
 	}
 
 	public String GetObjectProperties() {
-		return ExecuteQuery(getOwlObjectProperties);
+		return ExecuteQuery(getOwlObjectProperties,"");
 	}
 
 	public String GetDatatypeProperties() {
-		return ExecuteQuery(getOwlDatatypeProperties);
+		return ExecuteQuery(getOwlDatatypeProperties,"");
 	}
 
 	public String GetRules() {
-		Scanner scanner = new Scanner(ExecuteQuery(getRules));
+		Scanner scanner = new Scanner(ExecuteQuery(getRules,""));
 		String result = "";
 		List<String>list = new ArrayList<String>();
 		while (scanner.hasNextLine()) {
@@ -105,58 +105,28 @@ public class Talk {
 		return result;
 	}
 	
-	public String GetRulesDefinitions() {
+	public String GetRuleDefinition(String ruleName) {
 		String a,b,c, result="";
-		a =ExecuteQuery(getRules);
-		b=ExecuteQuery(getRules2);
-		c=ExecuteQuery(getRules3);
-		/*
+		a=ExecuteQuery(getRules,ruleName);
+		b=ExecuteQuery(getRules2,ruleName);
+		c=ExecuteQuery(getRules3,ruleName);
+		a = a+"\n"+b+"\n"+c;
+				
 		Scanner scanner = new Scanner(a);
 		while (scanner.hasNextLine()) {
 			String s = scanner.nextLine();
-			if(s.contains("swrlObj = ")||s.contains("b = ")) {
+			if(s.startsWith("swrlObj = http://a.com/ontology")||s.startsWith("b = http://a.com/ontology")) {
 				String[] temp = s.split("#");
 				try {
-				result+=temp[1]+"||";
-				}catch(Exception e) {
-					result+=s;
+				result+=temp[1]+"\n";
 				}
-			}
-		}
-
-	result+="\n";
-	scanner.close();
-	scanner = new Scanner(b);
-	while (scanner.hasNextLine()) {
-		String s = scanner.nextLine();
-		if(s.contains("swrlObj = ")||s.contains("b = ")) {
-			String[] temp = s.split("#");
-			try {
-			result+=temp[1]+"||";
-			}catch(Exception e) {
-				result+=s;
-			}
-		}
-	}
-
-result+="\n";
-scanner.close();
-scanner = new Scanner(c);
-while (scanner.hasNextLine()) {
-	String s = scanner.nextLine();
-	if(s.contains("swrlObj = ")||s.contains("b = ")) {
-		String[] temp = s.split("#");
-		try {
-		result+=temp[1]+"||";
-		}catch(Exception e) {
-			result+=s;
-		}
-	}
-}
-*/
-		//scanner.close();
-result=a+"\n"+b+"\n"+c;
-System.out.println(result);
+				catch(Exception e) {
+					result+=s+"\n";
+				}
+			}			
+		}	
+		scanner.close();
+		System.out.println(result);
 		return result;
 	}
 	

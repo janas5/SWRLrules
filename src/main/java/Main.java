@@ -8,8 +8,8 @@ public class Main {
 
         get("/sparql/:query", (req, res) ->{
             String query = req.params(":query");
-            System.out.println(query);
-            return talk.ExecuteQuery(query);
+            //System.out.println(query);
+            return talk.ExecuteQuery(query,"");
         });
 
         get("/classes", (req, res) -> {
@@ -32,9 +32,10 @@ public class Main {
         get("/rules", (req, res) -> {
             return talk.GetRules();
         });
-        
-        get("/rules-all", (req, res) -> {
-            return talk.GetRulesDefinitions();
+
+        get("/rules/:ruleName", (req, res) -> {
+        	String ruleName = req.params(":ruleName");
+        	return talk.GetRuleDefinition(ruleName);
         });
     }
 }
