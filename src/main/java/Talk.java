@@ -1,8 +1,11 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.QueryLanguage;
 import org.eclipse.rdf4j.query.TupleQuery;
@@ -10,6 +13,15 @@ import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.http.HTTPRepository;
+import org.eclipse.rdf4j.rio.datatypes.GeoSPARQLDatatypeHandler;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.swrlapi.core.SWRLAPIRule;
+import org.swrlapi.core.SWRLRuleEngine;
+import org.swrlapi.factory.SWRLAPIFactory;
+import org.swrlapi.ui.model.FileBackedSWRLRuleEngineModel;
 
 public class Talk {
 	String rdf4jServer = "http://77.55.220.23:8080//rdf4j-server/";
@@ -47,14 +59,19 @@ public class Talk {
 	
 	Repository repo;
 	
+	static File fileRepo;
+	
 	public void LoadRepository() {			
 		repo = new HTTPRepository(rdf4jServer, repositoryID);
 		repo.initialize();
+		
+		fileRepo = repo.getDataDir();
 	}
 	
 	public String ExecuteQuery(String query, String filter) {
 		String resultToReturn = "";
 		try (RepositoryConnection conn = repo.getConnection()){
+			
 			TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
 			try (TupleQueryResult result = tupleQuery.evaluate()) {
 				while (result.hasNext()) {  // iterate over the result
@@ -91,7 +108,7 @@ public class Talk {
 		return ExecuteQuery(getOwlDatatypeProperties,"");
 	}
 
-	public String GetRules() {
+	public String GetRules() {		
 		Scanner scanner = new Scanner(ExecuteQuery(getRules,""));
 		String result = "";
 		List<String>list = new ArrayList<String>();
@@ -143,7 +160,7 @@ public class Talk {
 		sb.append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> ");
 		sb.append("PREFIX bc: <http://a.com/ontology#> ");
 		sb.append("PREFIX swrl: <http://www.w3.org/2003/11/swrl#> ");
-
+		
 		return sb.toString();
 	}
 
@@ -176,5 +193,67 @@ public class Talk {
 		System.out.println(result);
 		return result;
 	}
+	
+	public void SwrlRepresentant()
+	{
+		String[] str = new String[1];
+		RunEngineSwrl(str);
+	}
+	
+	private static FileBackedSWRLRuleEngineModel _ruleEngineModel;
+	
+	public static void RunEngineSwrl(@NonNull String[] args)
+    {
+        args = new String[1];
+        args[0] = //"C:\\Users\\MasterX\\Desktop\\Nowy folder (2)\\ontologie\\family.swrl(rev10355).owl"
+        		//+ 
+        		"E:\\Uczeln\\S1Sem7\\ZTI\\family.swrl.owl";
+        Optional<@NonNull String> owlFilename = args.length == 0 ? Optional.<@NonNull String>empty() : Optional.of(args[0]);
+        Optional<@NonNull File> owlFile = (owlFilename != null && owlFilename.isPresent()) ?
+                Optional.of(new File(owlFilename.get())) :
+                Optional.<@NonNull File>empty();
+                
+
+        try {
+            // Create an OWL ontology using the OWLAPI
+            OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
+            OWLOntology ontology = owlFile.isPresent() ?
+                    ontologyManager.loadOntologyFromOntologyDocument(owlFile.get()) :
+                    ontologyManager.createOntology();
+            //OWLOntology ontology = ontologyManager.loadOntologyFromOntologyDocument(fileRepo);
+                   
+            // Create a rule engine
+            SWRLRuleEngine ruleEngine = SWRLAPIFactory.createSWRLRuleEngine(ontology);
+            
+            // Create a rule engine model. This is the core application model.
+            FileBackedSWRLRuleEngineModel ruleEngineModel = SWRLAPIFactory
+                    .createFileBackedSWRLRuleEngineModel(ruleEngine, owlFile);
+
+            _ruleEngineModel = ruleEngineModel;
+
+            printSwrlRules();
+
+        } catch (OWLOntologyCreationException e) {
+            if (owlFile.isPresent())
+                System.err.println("Error creating OWL ontology from file " + owlFile.get().getAbsolutePath() + ": " + (
+                        e.getMessage() != null ? e.getMessage() : ""));
+            else
+                System.err.println("Error creating OWL ontology: " + (e.getMessage() != null ? e.getMessage() : ""));
+            System.exit(-1);
+        } catch (RuntimeException e) {
+            System.err.println("Error starting application: " + (e.getMessage() != null ? e.getMessage() : ""));
+            System.exit(-1);
+        }
+    }
+
+    protected static void printSwrlRules()
+    {
+        SWRLRuleEngine engine =_ruleEngineModel.getSWRLRuleEngine();
+        Set<SWRLAPIRule> rules = engine.getSWRLRules();
+        for (SWRLAPIRule oneRule : rules)
+        {
+            System.out.println(engine.createSWRLRuleRenderer().renderSWRLRule(oneRule));
+        }
+    }
 	
 }
