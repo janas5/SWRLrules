@@ -207,7 +207,7 @@ public class Talk {
         args = new String[1];
         args[0] = //"C:\\Users\\MasterX\\Desktop\\Nowy folder (2)\\ontologie\\family.swrl(rev10355).owl"
         		//+ 
-        		"E:\\Uczeln\\S1Sem7\\ZTI\\family.swrl.owl";
+        		"family.swrl.owl";
         Optional<@NonNull String> owlFilename = args.length == 0 ? Optional.<@NonNull String>empty() : Optional.of(args[0]);
         Optional<@NonNull File> owlFile = (owlFilename != null && owlFilename.isPresent()) ?
                 Optional.of(new File(owlFilename.get())) :
@@ -231,7 +231,7 @@ public class Talk {
 
             _ruleEngineModel = ruleEngineModel;
 
-            printSwrlRules();
+            //printSwrlRules();
 
         } catch (OWLOntologyCreationException e) {
             if (owlFile.isPresent())
@@ -246,14 +246,17 @@ public class Talk {
         }
     }
 
-    protected static void printSwrlRules()
+    public String printSwrlRules()
     {
         SWRLRuleEngine engine =_ruleEngineModel.getSWRLRuleEngine();
         Set<SWRLAPIRule> rules = engine.getSWRLRules();
+        String s = "";
         for (SWRLAPIRule oneRule : rules)
         {
-            System.out.println(engine.createSWRLRuleRenderer().renderSWRLRule(oneRule));
+            s+=(engine.createSWRLRuleRenderer().renderSWRLRule(oneRule));
+            s+="\n";
         }
+        return s;
     }
 	
 }

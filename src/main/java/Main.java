@@ -5,6 +5,7 @@ public class Main {
     public static void main(String[] args) {
         talk = new Talk();
         talk.LoadRepository();
+        talk.SwrlRepresentant();
 
         get("/sparql/:query", (req, res) ->{
             String query = req.params(":query");
@@ -42,5 +43,10 @@ public class Main {
         	String className = req.params(":className");
         	return talk.GetRulesWith(className);
         });
+        
+        get("/swrl/rules", (req, res) -> {
+            return talk.printSwrlRules();
+        });
+        
     }
 }
