@@ -194,6 +194,22 @@ public class Talk {
 		return result;
 	}
 	
+	public Object GetSwrlRulesWith(String element) {
+		SWRLRuleEngine engine =_ruleEngineModel.getSWRLRuleEngine();
+        Set<SWRLAPIRule> rules = engine.getSWRLRules();
+        String s = "";
+        for (SWRLAPIRule oneRule : rules)
+        {
+        	String ruleStrFormat = engine.createSWRLRuleRenderer().renderSWRLRule(oneRule);
+        	if (ruleStrFormat.contains(element))
+        	{
+        		s+=(ruleStrFormat);
+        		s+="\n";
+        	}
+        }
+        return s;
+	}
+	
 	public void SwrlRepresentant()
 	{
 		String[] str = new String[1];

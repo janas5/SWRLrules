@@ -48,5 +48,10 @@ public class Main {
             return talk.printSwrlRules();
         });
         
+        get("/swrl/rules/with/:element", (req, res) -> {
+        	String className = req.params(":element");
+        	return talk.GetSwrlRulesWith(className);
+        });
+        
     }
 }
