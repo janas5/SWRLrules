@@ -37,5 +37,10 @@ public class Main {
         	String ruleName = req.params(":ruleName");
         	return talk.GetRuleDefinition(ruleName);
         });
+        
+        get("/rules/with/:className", (req, res) -> {
+        	String className = req.params(":className");
+        	return talk.GetRulesWith(className);
+        });
     }
 }

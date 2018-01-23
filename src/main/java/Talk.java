@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -40,6 +39,11 @@ public class Talk {
 			"?atomListInt rdf:rest ?swrlSub.\r\n" + 
 			"?swrlSub rdf:first ?swrlObj.\r\n" + 
 			"?swrlObj ?a ?b.\r\n}";
+	
+	String getRulesWith = GetPrefixes()+ "select ?p ?d where {\r\n" + 
+			"  ?p rdfs:domain|rdfs:range ?d\r\n" + 
+			"  filter isIri(?d)\r\n" + 
+			"}";
 	
 	Repository repo;
 	
@@ -141,6 +145,36 @@ public class Talk {
 		sb.append("PREFIX swrl: <http://www.w3.org/2003/11/swrl#> ");
 
 		return sb.toString();
+	}
+
+	public Object GetRulesWith(String className) {
+		String rules[] = GetRules().split("\\r?\\n");
+		String a=ExecuteQuery(getRulesWith,"");
+		String result="";
+		String temp="";
+		Scanner scanner = new Scanner(a);
+		
+		while (scanner.hasNextLine()) {
+			String s = scanner.nextLine();
+			if(s.equals("d = http://a.com/ontology#"+className)) {
+				String[] t = temp.split("#");
+				try {
+				for(String r:rules) {
+					if(r.equals(t[1]))
+						result+=t[1]+"\n";
+				}				
+				}
+				catch(Exception e) {
+					result+=temp+"\n";
+				}
+			}
+			else {
+				temp=s;
+			}			
+		}	
+		scanner.close();
+		System.out.println(result);
+		return result;
 	}
 	
 }
