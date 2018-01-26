@@ -17,7 +17,7 @@ const queryBase = `http://77.55.220.23:4567`;
 
 class App extends Component {
 
-  state = {query: '', rules: [], isSomeQuery: false, currentQuery: '', resultsQuantity: 0, currentOption: '/rules/'};
+  state = {query: '', rules: [], isSomeQuery: false, currentQuery: '', resultsQuantity: 0, currentOption: '/rules/', checkedRadioButton: '/rules/'};
 
   componentDidMount() {
     let self = this;
@@ -37,6 +37,7 @@ class App extends Component {
   executeQuery = (e) => {
     e.preventDefault();
     let self = this;
+    self.setState({currentOption: this.state.checkedRadioButton});
     axios({method: 'GET', url: queryBase + this.state.currentOption + this.state.currentQuery,
   json: true})
     .then(response => {
@@ -48,15 +49,14 @@ class App extends Component {
     });
   }
 
-  handleChange = (e) => {
+  handleQueryChange = (e) => {
     e.preventDefault();
     this.setState({currentQuery: e.target.value});
   }
 
   handleRadioButtonChange = (e) => {
-    e.preventDefault();
     console.log(e.target);
-    this.setState({currentOption: e.target.value});
+    this.setState({checkedRadioButton: e.target.value});
     console.log({statesy: this.state.currentOption, propsy: this.props});
   }
 
@@ -111,15 +111,15 @@ class App extends Component {
           <Col xs={6} className="query-form">
             <form onSubmit={this.executeQuery}>
               <FormGroup bsSize="large">
-                <FormControl type="text" value={this.state.currentQuery} onChange={this.handleChange} placeholder="Wpisz pytanie SPARQL..." />
+                <FormControl type="text" value={this.state.currentQuery} onChange={this.handleQueryChange} placeholder="Wpisz pytanie SPARQL..." />
               </FormGroup>
               <OverlayTrigger placement="left" overlay={tooltip}>
                 <Button type="submit" bsStyle="primary">Wyślij zapytanie</Button>
               </OverlayTrigger>
               <ButtonGroup className="radio-buttons-form">
-                <Radio name="groupOptions" value="/rules/" checked={this.state.currentOption === "/rules/" ? true : false} onChange={this.handleRadioButtonChange}>Lista reguł</Radio>
-                <Radio name="groupOptions" value="/rules/with/" checked={this.state.currentOption === "/rules/with/" ? true : false} onChange={this.handleRadioButtonChange}>Związki klasy</Radio>
-                <Radio name="groupOptions" value="/swrl/rules/" checked={this.state.currentOption === "/swrl/rules/" ? true : false} onChange={this.handleRadioButtonChange}>Option 3</Radio>
+                <Radio name="groupOptions" value="/rules/" defaultChecked checked={this.state.checkedRadioButton === "/rules/"} onChange={this.handleRadioButtonChange}>Lista reguł</Radio>
+                <Radio name="groupOptions" value="/rules/with/" checked={this.state.checkedRadioButton === "/rules/with/"} onChange={this.handleRadioButtonChange}>Związki klasy</Radio>
+                <Radio name="groupOptions" value="/swrl/rules/" checked={this.state.checkedRadioButton === "/swrl/rules/"} onChange={this.handleRadioButtonChange}>Option 3</Radio>
               </ButtonGroup>
             </form>
           </Col>
