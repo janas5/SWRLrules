@@ -55,3 +55,11 @@ header {
   margin-top: 15px;
   border-radius: 5px;
 }
+
+.radio-buttons-form {
+  float: left;
+}
+
+.radio label {
+  float: left;
+}
