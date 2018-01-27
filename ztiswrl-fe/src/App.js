@@ -17,7 +17,7 @@ const queryBase = `http://77.55.220.23:4567`;
 
 class App extends Component {
 
-  state = {query: '', rules: [], isSomeQuery: false, currentQuery: '', resultsQuantity: 0, currentOption: '/rules/', checkedRadioButton: '/rules/'};
+  state = {savedQuery: '', rules: [], isSomeQuery: false, currentQuery: '', resultsQuantity: 0, currentOption: '/rules', checkedRadioButton: '/rules', isExecutionDisabled: false};
 
   componentDidMount() {
     let self = this;
@@ -37,12 +37,12 @@ class App extends Component {
   executeQuery = (e) => {
     e.preventDefault();
     let self = this;
-    self.setState({currentOption: this.state.checkedRadioButton});
-    axios({method: 'GET', url: queryBase + this.state.currentOption + this.state.currentQuery,
+    self.setState({currentOption: this.state.checkedRadioButton, savedQuery: this.state.currentQuery.length===0 ? this.state.currentQuery : '/' + this.state.currentQuery });
+    axios({method: 'GET', url: queryBase + this.state.currentOption + this.state.savedQuery,
   json: true})
     .then(response => {
       self.setState({rules: response.data, resultsQuantity: response.data.split(/\r\n|\r|\n/).length-1});
-      console.log(response.data);
+      console.log({fetched: response.data, query: queryBase + this.state.currentOption + this.state.currentQuery});
     })
     .catch(error => {
       console.log(error);
@@ -55,9 +55,26 @@ class App extends Component {
   }
 
   handleRadioButtonChange = (e) => {
-    console.log(e.target);
     this.setState({checkedRadioButton: e.target.value});
-    console.log({statesy: this.state.currentOption, propsy: this.props});
+  }
+
+  shouldDisableExecution() {
+    const queryInInput = this.state.currentQuery;
+    const checkedRB = this.state.checkedRadioButton;
+    if((/[A-Z]/.test(queryInInput[0]) && checkedRB === "/rules") || (/[a-z]/.test(queryInInput[0]) && checkedRB === "/rules/with")) {
+      this.state.isExecutionDisabled=true;
+    }
+    else this.state.isExecutionDisabled=false;
+    console.log("wykonałem się!");
+  }
+
+  displayStatus() {
+    if (this.state.isSomeQuery===true && this.state.rules.length===0) {
+      return <div className="query-results-warning"><Icon spin name="spinner" /><p>Brak wyników!</p></div>;
+    }
+    else if (this.state.isSomeQuery===false && this.state.rules.length===0) {
+      return <div className="query-results-warning"><Icon spin name="spinner" /><p>Wykonaj pytanie!</p></div>;
+    }
   }
 
   // renderRules(data) {
@@ -75,22 +92,22 @@ class App extends Component {
 
   renderRules(data, prefix) {
     let results = null;
-    if (prefix !== "/rules/") {
+    if (prefix === "/rules/with" || (prefix === "/rules" && this.state.savedQuery === "")) {
+      results = data.split("\n");
+      let resultsPreprocessed = [];
+      results.forEach((element) => {
+          resultsPreprocessed.push(element.substring(0, element.length));
+      }, this);
+      resultsPreprocessed.pop();
+      console.log({splitted_results: resultsPreprocessed});
+      return resultsPreprocessed.map((result) => {
+        return <Rule details={result} />
+      });
+    }
+    else {
       results = data;
       console.log(results);
       return <Rule details={results} />
-    }
-    else {
-    results = data.split("\n");
-    let resultsPreprocessed = [];
-    results.forEach((element) => {
-        resultsPreprocessed.push(element.substring(0, element.length));
-    }, this);
-    resultsPreprocessed.pop();
-    console.log({splitted_results: resultsPreprocessed});
-    return resultsPreprocessed.map((result) => {
-      return <Rule details={result} />
-    });
     }
     // return results.map((result) => {
     //      return <Rule details={result} />
@@ -99,7 +116,9 @@ class App extends Component {
 
   render() {
     //console.log(this.state.currentOption === "/rules/");
+    this.shouldDisableExecution();
     const quantity = this.state.resultsQuantity;
+    console.log(this.state);
     return (
       <div className="App">
         <header className="App-header">
@@ -114,18 +133,18 @@ class App extends Component {
                 <FormControl type="text" value={this.state.currentQuery} onChange={this.handleQueryChange} placeholder="Wpisz pytanie SPARQL..." />
               </FormGroup>
               <OverlayTrigger placement="left" overlay={tooltip}>
-                <Button type="submit" bsStyle="primary">Wyślij zapytanie</Button>
+                <Button type="submit" bsStyle="primary" disabled={this.state.isExecutionDisabled}>Wyślij zapytanie</Button>
               </OverlayTrigger>
               <ButtonGroup className="radio-buttons-form">
-                <Radio name="groupOptions" value="/rules/" defaultChecked checked={this.state.checkedRadioButton === "/rules/"} onChange={this.handleRadioButtonChange}>Lista reguł</Radio>
-                <Radio name="groupOptions" value="/rules/with/" checked={this.state.checkedRadioButton === "/rules/with/"} onChange={this.handleRadioButtonChange}>Związki klasy</Radio>
-                <Radio name="groupOptions" value="/swrl/rules/" checked={this.state.checkedRadioButton === "/swrl/rules/"} onChange={this.handleRadioButtonChange}>Option 3</Radio>
+                <Radio name="groupOptions" value="/rules" defaultChecked checked={this.state.checkedRadioButton === "/rules"} onChange={this.handleRadioButtonChange}>Reguła</Radio>
+                <Radio name="groupOptions" value="/rules/with" checked={this.state.checkedRadioButton === "/rules/with"} onChange={this.handleRadioButtonChange}>Związki klasy</Radio>
               </ButtonGroup>
             </form>
           </Col>
           <Col xs={6} className="query-results">
-            <h2>Wyniki<span className="query-results-quantity">{quantity}</span></h2>
-            {this.state.rules.length !== 0 ? this.renderRules(this.state.rules, this.state.currentOption) : <div className="query-results-warning"><Icon spin name="spinner" /><p>Wykonaj pytanie!</p></div>  }
+            <h2>Wyniki{/*<span className="query-results-quantity">{quantity}</span>*/}</h2>
+            {this.state.rules.length !== 0 ? this.renderRules(this.state.rules, this.state.currentOption) 
+            : this.displayStatus() }
           </Col>
         </div>
       </div>
