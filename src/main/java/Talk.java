@@ -136,6 +136,7 @@ public class Talk {
 		Scanner scanner = new Scanner(a);
 		while (scanner.hasNextLine()) {
 			String s = scanner.nextLine();
+			System.out.println(s);
 			if(s.startsWith("swrlObj = http://a.com/ontology")||s.startsWith("b = http://a.com/ontology")) {
 				String[] temp = s.split("#");
 				try {
@@ -192,87 +193,6 @@ public class Talk {
 		scanner.close();
 		System.out.println(result);
 		return result;
-	}
-	
-	public Object GetSwrlRulesWith(String element) {
-		SWRLRuleEngine engine =_ruleEngineModel.getSWRLRuleEngine();
-        Set<SWRLAPIRule> rules = engine.getSWRLRules();
-        String s = "";
-        for (SWRLAPIRule oneRule : rules)
-        {
-        	String ruleStrFormat = engine.createSWRLRuleRenderer().renderSWRLRule(oneRule);
-        	if (ruleStrFormat.contains(element))
-        	{
-        		s+=(ruleStrFormat);
-        		s+="\n";
-        	}
-        }
-        return s;
-	}
-	
-	public void SwrlRepresentant()
-	{
-		String[] str = new String[1];
-		RunEngineSwrl(str);
-	}
-	
-	private static FileBackedSWRLRuleEngineModel _ruleEngineModel;
-	
-	public static void RunEngineSwrl(@NonNull String[] args)
-    {
-        args = new String[1];
-        args[0] = //"C:\\Users\\MasterX\\Desktop\\Nowy folder (2)\\ontologie\\family.swrl(rev10355).owl"
-        		//+ 
-        		"/root/family.swrl.owl";
-        Optional<@NonNull String> owlFilename = args.length == 0 ? Optional.<@NonNull String>empty() : Optional.of(args[0]);
-        Optional<@NonNull File> owlFile = (owlFilename != null && owlFilename.isPresent()) ?
-                Optional.of(new File(owlFilename.get())) :
-                Optional.<@NonNull File>empty();
-                
-
-        try {
-            // Create an OWL ontology using the OWLAPI
-            OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
-            OWLOntology ontology = owlFile.isPresent() ?
-                    ontologyManager.loadOntologyFromOntologyDocument(owlFile.get()) :
-                    ontologyManager.createOntology();
-            //OWLOntology ontology = ontologyManager.loadOntologyFromOntologyDocument(fileRepo);
-                   
-            // Create a rule engine
-            SWRLRuleEngine ruleEngine = SWRLAPIFactory.createSWRLRuleEngine(ontology);
-            
-            // Create a rule engine model. This is the core application model.
-            FileBackedSWRLRuleEngineModel ruleEngineModel = SWRLAPIFactory
-                    .createFileBackedSWRLRuleEngineModel(ruleEngine, owlFile);
-
-            _ruleEngineModel = ruleEngineModel;
-
-            //printSwrlRules();
-
-        } catch (OWLOntologyCreationException e) {
-            if (owlFile.isPresent())
-                System.err.println("Error creating OWL ontology from file " + owlFile.get().getAbsolutePath() + ": " + (
-                        e.getMessage() != null ? e.getMessage() : ""));
-            else
-                System.err.println("Error creating OWL ontology: " + (e.getMessage() != null ? e.getMessage() : ""));
-            System.exit(-1);
-        } catch (RuntimeException e) {
-            System.err.println("Error starting application: " + (e.getMessage() != null ? e.getMessage() : ""));
-            System.exit(-1);
-        }
-    }
-
-    public String printSwrlRules()
-    {
-        SWRLRuleEngine engine =_ruleEngineModel.getSWRLRuleEngine();
-        Set<SWRLAPIRule> rules = engine.getSWRLRules();
-        String s = "";
-        for (SWRLAPIRule oneRule : rules)
-        {
-            s+=(engine.createSWRLRuleRenderer().renderSWRLRule(oneRule));
-            s+="\n";
-        }
-        return s;
-    }
+	}			
 	
 }

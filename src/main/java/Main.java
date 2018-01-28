@@ -30,10 +30,9 @@ public class Main {
     }
     
     public static void main(String[] args) {
-    	enableCORS("*","*","*");
+    	//enableCORS("*","*","*");
         talk = new Talk();
         talk.LoadRepository();
-        talk.SwrlRepresentant();
 
         get("/sparql/:query", (req, res) ->{
             String query = req.params(":query");
@@ -70,15 +69,6 @@ public class Main {
         get("/rules/with/:className", (req, res) -> {
         	String className = req.params(":className");
         	return talk.GetRulesWith(className);
-        });
-        
-        get("/swrl/rules", (req, res) -> {
-            return talk.printSwrlRules();
-        });
-        
-        get("/swrl/rules/with/:element", (req, res) -> {
-        	String className = req.params(":element");
-        	return talk.GetSwrlRulesWith(className);
         });
         
     }
