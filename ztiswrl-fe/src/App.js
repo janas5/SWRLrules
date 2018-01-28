@@ -104,6 +104,20 @@ class App extends Component {
         return <Rule details={result} />
       });
     }
+    else if (prefix === "/sparql") {
+      results = data.split("\n");
+      let resultsPreprocessed = [];
+      results.forEach((element) => {
+          const hashPlace = element.indexOf('#');
+          console.log(hashPlace);
+          resultsPreprocessed.push(element.substring(hashPlace+1, element.length));
+      }, this);
+      resultsPreprocessed.pop();
+      console.log({splitted_results: resultsPreprocessed});
+      return resultsPreprocessed.map((result) => {
+        return <Rule details={result} />
+      });
+    }
     else {
       results = data;
       console.log(results);
@@ -138,6 +152,7 @@ class App extends Component {
               <ButtonGroup className="radio-buttons-form">
                 <Radio name="groupOptions" value="/rules" defaultChecked checked={this.state.checkedRadioButton === "/rules"} onChange={this.handleRadioButtonChange}>Reguła</Radio>
                 <Radio name="groupOptions" value="/rules/with" checked={this.state.checkedRadioButton === "/rules/with"} onChange={this.handleRadioButtonChange}>Związki klasy</Radio>
+                <Radio name="groupOptions" value="/sparql" checked={this.state.checkedRadioButton === "/sparql"} onChange={this.handleRadioButtonChange}>Zapytanie SPARQL</Radio>
               </ButtonGroup>
             </form>
           </Col>
