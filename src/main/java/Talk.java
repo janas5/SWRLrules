@@ -1,11 +1,9 @@
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.QueryLanguage;
 import org.eclipse.rdf4j.query.TupleQuery;
@@ -13,15 +11,6 @@ import org.eclipse.rdf4j.query.TupleQueryResult;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.http.HTTPRepository;
-import org.eclipse.rdf4j.rio.datatypes.GeoSPARQLDatatypeHandler;
-import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.swrlapi.core.SWRLAPIRule;
-import org.swrlapi.core.SWRLRuleEngine;
-import org.swrlapi.factory.SWRLAPIFactory;
-import org.swrlapi.ui.model.FileBackedSWRLRuleEngineModel;
 
 public class Talk {
 	String rdf4jServer = "http://77.55.220.23:8080//rdf4j-server/";
@@ -136,7 +125,6 @@ public class Talk {
 		Scanner scanner = new Scanner(a);
 		while (scanner.hasNextLine()) {
 			String s = scanner.nextLine();
-			System.out.println(s);
 			if(s.startsWith("swrlObj = http://a.com/ontology")||s.startsWith("b = http://a.com/ontology")) {
 				String[] temp = s.split("#");
 				try {
