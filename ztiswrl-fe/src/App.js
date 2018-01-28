@@ -90,6 +90,20 @@ class App extends Component {
   //      });
   // }
 
+  showClasses = (e) => {
+    e.preventDefault();
+    let self = this;
+    axios({method: 'GET', url: queryBase + '/classes',
+  json: true})
+    .then(response => {
+      self.setState({currentOption: '/classes', rules: response.data, resultsQuantity: response.data.split(/\r\n|\r|\n/).length-1});
+      console.log({fetched: response.data});
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  }
+
   renderRules(data, prefix) {
     let results = null;
     if (prefix === "/rules/with" || (prefix === "/rules" && this.state.savedQuery === "")) {
@@ -104,7 +118,7 @@ class App extends Component {
         return <Rule details={result} />
       });
     }
-    else if (prefix === "/sparql") {
+    else if (prefix === "/sparql" || prefix === "/classes") {
       results = data.split("\n");
       let resultsPreprocessed = [];
       results.forEach((element) => {
@@ -146,12 +160,14 @@ class App extends Component {
               <FormGroup bsSize="large">
                 <FormControl type="text" value={this.state.currentQuery} onChange={this.handleQueryChange} placeholder="Wpisz pytanie SPARQL..." />
               </FormGroup>
-              <OverlayTrigger placement="left" overlay={tooltip}>
+              {/* <OverlayTrigger placement="left" overlay={tooltip}> */}
                 <Button type="submit" bsStyle="primary" disabled={this.state.isExecutionDisabled}>Wyślij zapytanie</Button>
-              </OverlayTrigger>
+                
+              {/* </OverlayTrigger> */}
+              <Button onClick={this.showClasses} bsStyle="primary" style={{marginLeft: 25}}>Wyświetl klasy</Button>
               <ButtonGroup className="radio-buttons-form">
                 <Radio name="groupOptions" value="/rules" defaultChecked checked={this.state.checkedRadioButton === "/rules"} onChange={this.handleRadioButtonChange}>Reguła</Radio>
-                <Radio name="groupOptions" value="/rules/with" checked={this.state.checkedRadioButton === "/rules/with"} onChange={this.handleRadioButtonChange}>Związki klasy</Radio>
+                <Radio name="groupOptions" value="/rules/with" checked={this.state.checkedRadioButton === "/rules/with"} onChange={this.handleRadioButtonChange}>Reguły związane z klasą</Radio>
                 <Radio name="groupOptions" value="/sparql" checked={this.state.checkedRadioButton === "/sparql"} onChange={this.handleRadioButtonChange}>Zapytanie SPARQL</Radio>
               </ButtonGroup>
             </form>
