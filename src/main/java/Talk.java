@@ -223,7 +223,7 @@ public class Talk {
         args = new String[1];
         args[0] = //"C:\\Users\\MasterX\\Desktop\\Nowy folder (2)\\ontologie\\family.swrl(rev10355).owl"
         		//+ 
-        		"family.swrl.owl";
+        		"/root/family.swrl.owl";
         Optional<@NonNull String> owlFilename = args.length == 0 ? Optional.<@NonNull String>empty() : Optional.of(args[0]);
         Optional<@NonNull File> owlFile = (owlFilename != null && owlFilename.isPresent()) ?
                 Optional.of(new File(owlFilename.get())) :
